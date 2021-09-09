@@ -1,0 +1,26 @@
+target
+tomcat.8080
+tomcat.5000
+
+# IntelliJ Idea project files
+.idea
+*.iml
+.DS_Store
+.mvn
+
+# User-specific stuff:
+.gradle
+*.config
+**/build
+**/out
+
+# Package Files
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Log file
+*.log
