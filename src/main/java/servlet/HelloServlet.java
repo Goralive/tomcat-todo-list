@@ -1,11 +1,11 @@
 package servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Task;
-import service.TodoListImp;
-import utils.JsonMapper;
+import service.TaskCrudService;
 
 import java.io.IOException;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,13 +20,14 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
         urlPatterns = {"/todo"}
 )
 public class HelloServlet extends HttpServlet {
-    private final TodoListImp todo = new TodoListImp();
+    private  final ObjectMapper mapper = new ObjectMapper();
+    private final TaskCrudService todo = new TaskCrudService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            String response = todo.parseGetRequest();
-            todo.sendResponse(resp.getWriter(), response);
+            Collection<Task> tasks = todo.fetchAll();
+            mapper.writeValue(resp.getOutputStream(), tasks);
             resp.setStatus(SC_OK);
         } catch (IOException e) {
             resp.setStatus(SC_BAD_REQUEST);
@@ -36,9 +37,9 @@ public class HelloServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            Task requestTask = JsonMapper.parse(req.getReader().lines().collect(Collectors.joining()), Task.class);
-            String response = todo.parsePostRequest(requestTask);
-            todo.sendResponse(resp.getWriter(), response);
+            Task requestTask = mapper.readValue(req.getInputStream(), Task.class);
+            Task result = todo.save(requestTask);
+            mapper.writeValue(resp.getOutputStream(), result);
             resp.setStatus(SC_OK);
         } catch (IOException e) {
             resp.setStatus(SC_BAD_REQUEST);
@@ -48,17 +49,17 @@ public class HelloServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        String query = req.getQueryString();
-        if (query != null) {
+        String idStr = req.getParameter("id");
+        if (idStr != null) {
             try {
-                Integer id = Integer.valueOf(query.substring(query.lastIndexOf("=") + 1));
-                todo.parseDeleteRequest(id);
-            } catch (NumberFormatException e) {
+                int id = Integer.parseInt(idStr);
+                todo.delete(id);
+                resp.setStatus(SC_OK);
+            } catch (Exception e) {
                 resp.setStatus(SC_BAD_REQUEST);
             }
         } else {
-            todo.parseDeleteRequest();
+            todo.clear();
         }
-        resp.setStatus(SC_OK);
     }
 }

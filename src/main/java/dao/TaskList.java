@@ -6,18 +6,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TodoList {
+public class TaskList {
+
     private final Map<Integer, Task> taskMap;
     private int counter = 1;
 
-    public TodoList() {
+    public TaskList() {
         this.taskMap = new HashMap<>();
     }
 
     public int addTask(Task task) {
-        task.setId(counter);
+        task.setId(counter++);
         taskMap.put(task.getId(), task);
-        counter++;
         return task.getId();
     }
 
@@ -25,11 +25,17 @@ public class TodoList {
         this.taskMap.remove(id);
     }
 
-    public void deleteTask() {
+    public void clear() {
         this.taskMap.clear();
     }
 
     public Collection<Task> getAllTasks() {
         return taskMap.values();
+    }
+
+    public void update(Task task) {
+        if (taskMap.containsKey(task.getId())) {
+            taskMap.put(task.getId(), task);
+        }
     }
 }
