@@ -24,13 +24,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
         urlPatterns = {"/todo"}
 )
 public class HelloServlet extends HttpServlet {
-    private ConfigurableApplicationContext context;
     private ObjectMapper mapper;
     private TaskCrudService todoService;
 
     @Override
     public void init() {
-        context = new AnnotationConfigApplicationContext(ContextConfiguration.class);
+        ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(ContextConfiguration.class);
         mapper = context.getBean(ObjectMapper.class);
         todoService = context.getBean(TaskCrudService.class);
     }
