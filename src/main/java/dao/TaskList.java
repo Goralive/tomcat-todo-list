@@ -11,8 +11,8 @@ public class TaskList {
     private final Map<Integer, Task> taskMap;
     private int counter = 1;
 
-    public TaskList() {
-        this.taskMap = new HashMap<>();
+    public TaskList(Map<Integer, Task> taskMap) {
+        this.taskMap = taskMap;
     }
 
     public int addTask(Task task) {

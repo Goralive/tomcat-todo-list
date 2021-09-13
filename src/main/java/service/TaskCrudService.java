@@ -10,8 +10,12 @@ import java.util.Collection;
 import java.util.Objects;
 
 public class TaskCrudService implements CrudService<Task, Integer> {
-    private final TaskList listOfTask = new TaskList();
+    private final TaskList listOfTask;
     private static final Logger logger = LoggerFactory.getLogger(TaskCrudService.class);
+
+    public TaskCrudService(TaskList listOfTask) {
+        this.listOfTask = listOfTask;
+    }
 
     @Override
     public Task save(Task task) {
