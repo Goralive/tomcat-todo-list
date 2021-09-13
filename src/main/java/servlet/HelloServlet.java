@@ -2,11 +2,15 @@ package servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Task;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import service.TaskCrudService;
+import spring.ContextConfiguration;
 
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +24,21 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
         urlPatterns = {"/todo"}
 )
 public class HelloServlet extends HttpServlet {
-    private  final ObjectMapper mapper = new ObjectMapper();
-    private final TaskCrudService todo = new TaskCrudService();
+    private ConfigurableApplicationContext context;
+    private ObjectMapper mapper;
+    private TaskCrudService todoService;
+
+    @Override
+    public void init() {
+        context = new AnnotationConfigApplicationContext(ContextConfiguration.class);
+        mapper = context.getBean(ObjectMapper.class);
+        todoService = context.getBean(TaskCrudService.class);
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            Collection<Task> tasks = todo.fetchAll();
+            Collection<Task> tasks = todoService.fetchAll();
             mapper.writeValue(resp.getOutputStream(), tasks);
             resp.setStatus(SC_OK);
         } catch (IOException e) {
@@ -38,7 +50,7 @@ public class HelloServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
             Task requestTask = mapper.readValue(req.getInputStream(), Task.class);
-            Task result = todo.save(requestTask);
+            Task result = todoService.save(requestTask);
             mapper.writeValue(resp.getOutputStream(), result);
             resp.setStatus(SC_OK);
         } catch (IOException e) {
@@ -53,13 +65,13 @@ public class HelloServlet extends HttpServlet {
         if (idStr != null) {
             try {
                 int id = Integer.parseInt(idStr);
-                todo.delete(id);
+                todoService.delete(id);
                 resp.setStatus(SC_OK);
             } catch (Exception e) {
                 resp.setStatus(SC_BAD_REQUEST);
             }
         } else {
-            todo.clear();
+            todoService.clear();
         }
     }
 }
