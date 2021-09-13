@@ -21,6 +21,6 @@ public class ContextConfiguration {
 
     @Bean
     public TaskCrudService taskCrudService() {
-        return new TaskCrudService();
+        return new TaskCrudService(taskListDao());
     }
 }
